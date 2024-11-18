@@ -4,6 +4,7 @@ matplotlib.use('Agg')  # Use a non-GUI backend
 import matplotlib.pyplot as plt
 
 # File paths for datasets
+DATA_PATH_CITY = "./data/GlobalLandTemperaturesByCity.csv"
 DATA_PATH_COUNTRY = "./data/GlobalLandTemperaturesByCountry.csv"
 DATA_PATH_MAJOR_CITY = "./data/GlobalLandTemperaturesByMajorCity.csv"
 DATA_PATH_STATE = "./data/GlobalLandTemperaturesByState.csv"
@@ -48,7 +49,7 @@ def analyze_city_trend(data, city):
     """
     city_data = data[data['City'] == city]
     if city_data.empty:
-        print(f"Error: No data found for the city '{city}' in the Major Cities dataset.")
+        print(f"Error: No data found for the city '{city}'.")
         return
     
     plot_temperature_trend(city_data, f'{city} Average Temperature', f'Temperature Trend in {city}', f'{city}_trend.png')
@@ -107,12 +108,14 @@ def analyze_global_trend(data):
 
 if __name__ == "__main__":
     # Load all datasets
+    city_data = load_data(DATA_PATH_CITY)
     country_data = load_data(DATA_PATH_COUNTRY)
     major_city_data = load_data(DATA_PATH_MAJOR_CITY)
     state_data = load_data(DATA_PATH_STATE)
     global_data = load_data(DATA_PATH_GLOBAL)
     
     # Clean datasets
+    city_data = clean_data(city_data, 'dt', drop_columns=['AverageTemperatureUncertainty'])
     country_data = clean_data(country_data, 'dt')
     major_city_data = clean_data(major_city_data, 'dt')
     state_data = clean_data(state_data, 'dt')
@@ -120,7 +123,7 @@ if __name__ == "__main__":
     
     # Ask the user for their desired analysis type
     print("\nAnalysis Options:")
-    print("1. Major City temperature trend")
+    print("1. City temperature trend")
     print("2. Country temperature trend")
     print("3. Compare temperature trends between two cities")
     print("4. Global temperature trend")
@@ -129,14 +132,14 @@ if __name__ == "__main__":
     
     if choice == 1:
         city_name = input("Enter the name of the city: ").strip()
-        analyze_city_trend(major_city_data, city_name)
+        analyze_city_trend(city_data, city_name)
     elif choice == 2:
         country_name = input("Enter the name of the country: ").strip()
         analyze_country_trend(country_data, country_name)
     elif choice == 3:
         city1 = input("Enter the name of the first city: ").strip()
         city2 = input("Enter the name of the second city: ").strip()
-        compare_trends(major_city_data, city1, city2, is_city=True)
+        compare_trends(city_data, city1, city2, is_city=True)
     elif choice == 4:
         analyze_global_trend(global_data)
     else:
